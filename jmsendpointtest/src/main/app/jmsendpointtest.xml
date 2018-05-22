@@ -17,6 +17,12 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     <flow name="jmsendpointtestFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/addproduct" doc:name="HTTP" allowedMethods="POST"/>
         <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
-        <jms:outbound-endpoint queue="productsq" connector-ref="Active_MQ" doc:name="JMS"/>
+        <set-property propertyName="JMSReplyTo" value="myreplyq" doc:name="Property"/>
+        <jms:outbound-endpoint queue="productsq" connector-ref="Active_MQ" doc:name="JMS" exchange-pattern="request-response"/>
+    </flow>
+    <flow name="jmsendpointtestFlow1">
+        <jms:inbound-endpoint exchange-pattern="request-response" queue="productsq" connector-ref="Active_MQ" doc:name="JMS"/>
+        <logger message="************PAYLOAD: #[payload]" level="INFO" doc:name="Logger"/>
+        <set-payload value="&quot;Product Added Successfully!&quot;" doc:name="Set Payload"/>
     </flow>
 </mule>
